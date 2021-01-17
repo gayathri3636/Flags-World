@@ -2,14 +2,31 @@ import React, { useEffect, useState } from 'react';
 import {Card} from 'react-bootstrap';
 import Home from './Home';
 
-export default function Flagslist() {
+export default function Flagslist(props) {
     const [value, setvalue] = useState([]);
     const formbody = {
-        query:`query {
+        query:`
+        query {
             Flag{
+            _id
             svgFile
             country{
+              area
+              capital
+              location{
+                longitude
+                latitude
+              }
               name
+              population
+              timezones{
+                _id
+              }
+              borders{
+                subregion{
+                  name
+                }
+              }
             }
           }
         }`
@@ -18,7 +35,12 @@ export default function Flagslist() {
     useEffect(()=>{
         handleFetch()
     },[])
-    
+    const handleDetail = (item) => {
+        props.history.push({
+            pathname: "flaglist/"+ item._id,
+            state:item
+        })
+    }
     const handleFetch = () => {
         fetch('https://countries-274616.ew.r.appspot.com/', {
             method:"POST",
@@ -36,8 +58,8 @@ export default function Flagslist() {
         <div style={{display:'flex', flexDirection:'row', flexWrap:'wrap', width:'100%', justifyContent: "space-around"}}>
             {value && value.length!== 'undefined'?
         value.map((item)=>(
-        <div>
-            <Card border="primary" style={{margin: "10px", width:'20rem'}} >
+        <div onClick={()=> handleDetail(item)} >
+            <Card key={item._id} border="primary" style={{margin: "10px", width:'20rem'}} >
                 <Card.Header>
                     <h3 style={{textAlign:'center'}}>{item.country.name}</h3>
                 </Card.Header>
